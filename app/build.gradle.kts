@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.bignerdranch.android.weatherapp"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.bignerdranch.android.weatherapp"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
