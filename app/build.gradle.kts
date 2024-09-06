@@ -52,7 +52,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+
+    implementation ("androidx.activity:activity-ktx:1.4.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.4")
 
 }

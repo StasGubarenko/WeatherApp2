@@ -2,34 +2,37 @@ package com.bignerdranch.android.weatherapp.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
-import com.bignerdranch.android.weatherapp.R
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import com.bignerdranch.android.weatherapp.databinding.ActivityMainBinding
-import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
-    private lateinit var viewModel: MainActivityViewModel
+
+    private val viewModel: MainActivityViewModel by viewModels{MainViewModelFactory()}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
 
-        viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
-
         //Тап на кнопку
         mainBinding.searchButton.setOnClickListener {
             val city = mainBinding.search.text.toString()
-            load(city = city)
+
+            lifecycleScope.launch {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED){
+                    val weather = viewModel.loadWeather(city = city)
+
+                    mainBinding.city.text = weather?.location?.name
+                    mainBinding.conditionOfWeather.text = weather?.current?.condition?.text
+                    mainBinding.temp.text = weather?.current?.temp_c.toString()
+                }
+            }
         }
-
-
     }
-
-    private fun load(city: String){
-        viewModel.loadWeather(city = city)
-    }
-
 }

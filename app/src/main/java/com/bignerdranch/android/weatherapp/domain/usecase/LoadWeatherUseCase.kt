@@ -1,11 +1,14 @@
 package com.bignerdranch.android.weatherapp.domain.usecase
 
-import com.bignerdranch.android.weatherapp.data.repository.WeatherRepositoryImp
 import com.bignerdranch.android.weatherapp.domain.models.Weather
+import com.bignerdranch.android.weatherapp.domain.repository.WeatherRepository
 
-class LoadWeatherUseCase(private val weatherRepository: WeatherRepositoryImp) {
+//Почему передали в LoadWeatherUseCase?
+//Почему тип данных WeatherRepositoryImp?
+//Что должен вернуть execute?
+class LoadWeatherUseCase(private val weatherRepository: WeatherRepository) {
 
-    suspend fun execute(city : String) : Weather{
-        weatherRepository.getWeatherInfo(city = city)
+     suspend fun execute(city : String) : Weather?{
+       return weatherRepository.getWeatherInfo(city = city)
     }
 }

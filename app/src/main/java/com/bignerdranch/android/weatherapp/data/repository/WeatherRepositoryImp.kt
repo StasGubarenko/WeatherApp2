@@ -1,23 +1,22 @@
 package com.bignerdranch.android.weatherapp.data.repository
 
 import com.bignerdranch.android.weatherapp.data.retrofit.RetrofitInstance
+import com.bignerdranch.android.weatherapp.data.util.BaseAuth
 import com.bignerdranch.android.weatherapp.domain.models.Weather
 import com.bignerdranch.android.weatherapp.domain.repository.WeatherRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import retrofit2.Response
 
-class WeatherRepositoryImp : WeatherRepository {
+class WeatherRepositoryImp() : WeatherRepository {
 
-    override suspend fun getWeatherInfo(city: String): Flow<Response<Weather>> {
-        return flow {
-            val response = RetrofitInstance.api.getInfo(city)
+    override suspend fun getWeatherInfo(city: String): Weather? {
 
-            if (response.isSuccessful){
-                //Какая - то логика
+            val response = RetrofitInstance.weatherAPI.getInfo(api = BaseAuth.API, city = city)
+
+         return  if (response.isSuccessful){
+
+             response.body()
             }else{
-                //Обработка ошибки
+                null
             }
+
         }
     }
-}
