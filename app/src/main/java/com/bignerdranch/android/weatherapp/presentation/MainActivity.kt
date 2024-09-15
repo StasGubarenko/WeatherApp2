@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity() {
                     val weather = viewModel.loadWeather(city = city)
 
                     mainBinding.city.text = weather?.location?.name
-                    mainBinding.conditionOfWeather.text = weather?.current?.condition?.text
-                    mainBinding.temp.text = weather?.current?.temp_c.toString()
+                    mainBinding.conditionOfWeather.text = weather?.currentConditions?.condition?.text
+                    mainBinding.temp.text = weather?.currentConditions?.temp_c.toString()
                 }
             }
         }

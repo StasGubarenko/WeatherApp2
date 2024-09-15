@@ -14,8 +14,11 @@ class WeatherRepositoryImp() : WeatherRepository {
          return  if (response.isSuccessful){
 
              response.body()
+
             }else{
+
                 null
+
             }
 
         }
