@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bignerdranch.android.weatherapp.data.repository.WeatherRepositoryImp
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
+import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
 
 /*
 4. С Женей обсудить тему по данному паттерну и почему используем
@@ -17,8 +18,13 @@ class MainViewModelFactory : ViewModelProvider.Factory {
         LoadWeatherUseCase(weatherRepository = userRepository )
     }
 
+    private val validationFieldUseCase by lazy(LazyThreadSafetyMode.NONE){
+        ValidationFieldUseCase()
+    }
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MainActivityViewModel(
-            loadWeatherUseCase = loadWeatherUseCase) as T
+            loadWeatherUseCase = loadWeatherUseCase,
+            validationFieldUseCase = validationFieldUseCase) as T
     }
 }
