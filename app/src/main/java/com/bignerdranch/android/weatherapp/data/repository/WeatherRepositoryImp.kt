@@ -1,9 +1,12 @@
 package com.bignerdranch.android.weatherapp.data.repository
 
+import android.util.Log
+import android.widget.Toast
 import com.bignerdranch.android.weatherapp.data.retrofit.RetrofitInstance
 import com.bignerdranch.android.weatherapp.data.util.BaseAuth
 import com.bignerdranch.android.weatherapp.domain.models.Weather
 import com.bignerdranch.android.weatherapp.domain.repository.WeatherRepository
+import com.bignerdranch.android.weatherapp.presentation.MainActivity
 
 class WeatherRepositoryImp() : WeatherRepository {
 
@@ -16,9 +19,7 @@ class WeatherRepositoryImp() : WeatherRepository {
              response.body()
 
             }else{
-
                 null
-
             }
 
         }
