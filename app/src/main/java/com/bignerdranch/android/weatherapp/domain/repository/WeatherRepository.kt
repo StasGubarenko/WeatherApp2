@@ -1,8 +1,6 @@
 package com.bignerdranch.android.weatherapp.domain.repository
 
-import com.bignerdranch.android.weatherapp.domain.models.Weather
-import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
+import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 
 //Почему WeatherRepository находится в слое domain?
 // Что такое репозиторий?

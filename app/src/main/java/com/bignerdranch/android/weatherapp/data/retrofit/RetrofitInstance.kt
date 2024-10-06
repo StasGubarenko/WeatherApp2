@@ -5,14 +5,18 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 
 object RetrofitInstance {
-    const val URL = "https://api.weatherapi.com/v1/current.json/"
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val weatherAPI = retrofit.create(WeatherAPI::class.java)
+    private const val URL_WEATHER = "https://api.weatherapi.com/v1/current.json/"
+    private const val URL_CITY = "https://api.api-ninjas.com/v1/city/"
 
 
+    val weatherAPI = createRetrofit(URL_WEATHER).create(WeatherAPI::class.java)
+    val cityAPI = createRetrofit(URL_CITY).create(CityAPI::class.java)
+
+    private fun createRetrofit(url: String) : Retrofit{
+        return Retrofit.Builder()
+            .baseUrl(url)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 }

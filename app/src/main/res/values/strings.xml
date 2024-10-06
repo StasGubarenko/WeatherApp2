@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="title_for_first_fragment">Fragment 1</string>
+    <string name="title_for_second_fragment">Fragment 2</string>
+    <string name="search_button">Search</string>
+    <string name="back_button">Back</string>
 </resources>
