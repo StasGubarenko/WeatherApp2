@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +19,8 @@ import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.databinding.FragmentSearchBinding
 import com.bignerdranch.android.weatherapp.domain.models.city.City
+import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
+import com.bignerdranch.android.weatherapp.presentation.fragments.State
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentsViewModelFactory
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentViewModel
 import kotlinx.coroutines.launch
@@ -27,6 +31,7 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
+    //Здесь отправляем запрос на получения городов
     private val textWatcher : TextWatcher = object : TextWatcher{
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -55,7 +60,6 @@ class SearchFragment : Fragment() {
 
     }
 
-    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,18 +76,15 @@ class SearchFragment : Fragment() {
 
                 val inputCity = binding.search.text.toString()
 
-                lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED){
+                val weather = viewModel.loadWeather(city = inputCity)
 
-                    //Потом добавить лоудер
-                    val weather = viewModel.loadWeather(city = inputCity)
-                    binding.progressBar.visibility = View.VISIBLE
+                handleResponse(weather)
+                /**
+                 * ЕСЛИ НЕ СМОГЛИ ПОЛУЧИТЬ ПРОГНОЗ ПОГОДЫ, ТО ЛОУДЕР НЕ КРУТИТСЯ И ОТОБРАЖАЕТСЯ ОШИБКА
+                 */
+
+                binding.progressBar.visibility = View.VISIBLE
                     binding.button.text =""
-
-                    if (weather != null){
-                        viewModel.sendCity(weather = weather)
-                        findNavController().navigate(R.id.detailedFragment)
-                    }
-                }
             }
         }
 
@@ -105,4 +106,24 @@ class SearchFragment : Fragment() {
         return cities
     }
 
+    private suspend fun handleResponse(weather: Weather?) {
+        val result = if (weather != null){
+            State.Success(weather = weather)
+        }else{
+            State.Error
+        }
+
+        when(result){
+            is State.Success -> {
+                if (weather != null) {
+                    viewModel.sendWeather(weather)
+                }
+                findNavController().navigate(R.id.detailedFragment)
+            }
+            is State.Error ->{
+                Toast.makeText(requireContext(),"Ошибка",Toast.LENGTH_LONG).show()
+            }
+        }
+
+    }
 }

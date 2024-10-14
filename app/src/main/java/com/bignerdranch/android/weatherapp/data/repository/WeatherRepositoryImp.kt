@@ -1,5 +1,6 @@
 package com.bignerdranch.android.weatherapp.data.repository
 
+import android.util.Log
 import com.bignerdranch.android.weatherapp.data.retrofit.RetrofitInstance
 import com.bignerdranch.android.weatherapp.data.util.BaseAuth
 import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
@@ -13,10 +14,12 @@ class WeatherRepositoryImp() : WeatherRepository {
 
          return  if (response.isSuccessful){
 
+             Log.d("CHECK","${response.body()}")
              response.body()
 
             }else{
 
+             Log.d("CHECK null","${response.body()}")
                 null
 
             }
