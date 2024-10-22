@@ -4,4 +4,6 @@
     <string name="title_for_second_fragment">Fragment 2</string>
     <string name="search_button">Search</string>
     <string name="back_button">Back</string>
+    <string name="error">Что-то пошло не так</string>
+    <string name="error_message">Latin letters only</string>
 </resources>

@@ -6,15 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.databinding.FragmentDetailedBinding
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentsViewModelFactory
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class DetailedFragment : Fragment() {
@@ -33,14 +30,12 @@ class DetailedFragment : Fragment() {
 
         val view = binding.root
 
-
-        lifecycleScope.launch {
-            viewModel._resultWeather.collect{
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.resultWeather.collect{
                 binding.nameCity.text = it.location.name
                 binding.temp.text = it.current.temp_c.toString()
                 binding.conditionOfWeather.text = it.current.condition.text
             }
-
         }
 
         binding.buttonBack.setOnClickListener {

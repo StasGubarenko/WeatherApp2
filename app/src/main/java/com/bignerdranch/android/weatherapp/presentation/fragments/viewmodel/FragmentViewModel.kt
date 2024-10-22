@@ -5,32 +5,36 @@ import com.bignerdranch.android.weatherapp.domain.models.city.City
 import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadCityUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
+import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 class FragmentViewModel(
     private val loadCityUseCase: LoadCityUseCase,
-    private val loadWeatherUseCase: LoadWeatherUseCase
+    private val loadWeatherUseCase: LoadWeatherUseCase,
+    private val validationFieldUseCase: ValidationFieldUseCase
 ) : ViewModel() {
 
-    private val resultWeather = MutableSharedFlow<Weather>()
-    val _resultWeather get() = resultWeather
+    private val _resultWeather = MutableSharedFlow<Weather>(replay = 1)
+    val resultWeather: SharedFlow<Weather> get() = _resultWeather
 
 
-     suspend fun sendWeather(weather: Weather){
-        resultWeather.emit(weather)
+    suspend fun sendWeather(weather: Weather) {
+        _resultWeather.emit(weather)
     }
-    suspend fun loadCities(input: String) : MutableList<City>{
+
+    suspend fun loadCities(input: String): MutableList<City> {
         return loadCityUseCase.loadCities(input = input)
     }
 
-    suspend fun loadWeather(city: String) : Weather?{
+    suspend fun loadWeather(city: String): Weather? {
 
         val result = loadWeatherUseCase.execute(city = city)
 
-        return  result
+        return result
     }
 
+    fun validate(input: String): Boolean {
+        return validationFieldUseCase.validate(input)
+    }
 }

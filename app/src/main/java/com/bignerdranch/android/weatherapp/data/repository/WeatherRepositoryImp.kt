@@ -10,19 +10,17 @@ class WeatherRepositoryImp() : WeatherRepository {
 
     override suspend fun getWeatherInfo(city: String): Weather? {
 
-            val response = RetrofitInstance.weatherAPI.getInfo(api = BaseAuth.API_WEATHER, city = city)
+        val response = RetrofitInstance.weatherAPI.getInfo(api = BaseAuth.API_WEATHER, city = city)
 
-         return  if (response.isSuccessful){
+        return if (response.isSuccessful) {
 
-             Log.d("CHECK","${response.body()}")
-             response.body()
+            response.body()
 
-            }else{
+        } else {
 
-             Log.d("CHECK null","${response.body()}")
-                null
-
-            }
+            null
 
         }
+
     }
+}

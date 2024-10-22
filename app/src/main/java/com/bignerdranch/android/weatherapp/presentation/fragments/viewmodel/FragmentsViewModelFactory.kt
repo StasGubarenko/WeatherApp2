@@ -6,18 +6,23 @@ import com.bignerdranch.android.weatherapp.data.repository.CityRepositoryImp
 import com.bignerdranch.android.weatherapp.data.repository.WeatherRepositoryImp
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadCityUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
+import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
 
-class FragmentsViewModelFactory: ViewModelProvider.Factory {
+class FragmentsViewModelFactory : ViewModelProvider.Factory {
 
-    private val cityRepository by lazy(LazyThreadSafetyMode.NONE){
+    private val cityRepository by lazy(LazyThreadSafetyMode.NONE) {
         CityRepositoryImp()
     }
 
-    private val weatherRepository by lazy (LazyThreadSafetyMode.NONE){
+    private val weatherRepository by lazy(LazyThreadSafetyMode.NONE) {
         WeatherRepositoryImp()
     }
-    private val loadCityUseCase: LoadCityUseCase by lazy(LazyThreadSafetyMode.NONE){
+    private val loadCityUseCase: LoadCityUseCase by lazy(LazyThreadSafetyMode.NONE) {
         LoadCityUseCase(cityRepository = cityRepository)
+    }
+
+    private val validationFieldUseCase by lazy(LazyThreadSafetyMode.NONE) {
+        ValidationFieldUseCase()
     }
 
 
@@ -28,7 +33,8 @@ class FragmentsViewModelFactory: ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return FragmentViewModel(
             loadCityUseCase = loadCityUseCase,
-            loadWeatherUseCase = loadWeatherUseCase
+            loadWeatherUseCase = loadWeatherUseCase,
+            validationFieldUseCase = validationFieldUseCase
         ) as T
     }
 }

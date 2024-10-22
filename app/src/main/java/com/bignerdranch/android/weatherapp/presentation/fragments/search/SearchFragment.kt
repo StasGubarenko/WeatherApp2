@@ -1,6 +1,7 @@
 package com.bignerdranch.android.weatherapp.presentation.fragments.search
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -27,12 +28,11 @@ import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
 
-    private val viewModel: FragmentViewModel by activityViewModels{ FragmentsViewModelFactory() }
+    private val viewModel: FragmentViewModel by activityViewModels { FragmentsViewModelFactory() }
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    //Здесь отправляем запрос на получения городов
-    private val textWatcher : TextWatcher = object : TextWatcher{
+    private val textWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -72,19 +72,32 @@ class SearchFragment : Fragment() {
         binding.search.addTextChangedListener(textWatcher)
 
         binding.button.setOnClickListener {
-            lifecycleScope.launch {
 
-                val inputCity = binding.search.text.toString()
+            val inputCity = binding.search.text.toString()
 
-                val weather = viewModel.loadWeather(city = inputCity)
+            val resultValidate = viewModel.validate(inputCity)
 
-                handleResponse(weather)
-                /**
-                 * ЕСЛИ НЕ СМОГЛИ ПОЛУЧИТЬ ПРОГНОЗ ПОГОДЫ, ТО ЛОУДЕР НЕ КРУТИТСЯ И ОТОБРАЖАЕТСЯ ОШИБКА
-                 */
 
+            if (resultValidate) {
                 binding.progressBar.visibility = View.VISIBLE
-                    binding.button.text =""
+                binding.button.text = ""
+
+                lifecycleScope.launch {
+
+
+                    try {
+                        val weather = viewModel.loadWeather(city = inputCity)
+
+                        handleResponse(weather)
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_LONG).show()
+                        binding.progressBar.visibility = View.INVISIBLE
+                        binding.button.text = getText(R.string.search_button)
+                    }
+                }
+            } else {
+                binding.search.setHintTextColor(Color.RED)
+                binding.search.error = getString(R.string.error_message)
             }
         }
 
@@ -96,10 +109,10 @@ class SearchFragment : Fragment() {
         _binding = null
     }
 
-    private fun getCities(geographicalFeature: MutableList<City>): ArrayList<String>{
+    private fun getCities(geographicalFeature: MutableList<City>): ArrayList<String> {
         val cities = arrayListOf<String>()
 
-        for (i in geographicalFeature.indices){
+        for (i in geographicalFeature.indices) {
             cities.add(geographicalFeature[i].name)
         }
 
@@ -107,23 +120,26 @@ class SearchFragment : Fragment() {
     }
 
     private suspend fun handleResponse(weather: Weather?) {
-        val result = if (weather != null){
+
+        val result = if (weather != null) {
             State.Success(weather = weather)
-        }else{
+        } else {
             State.Error
         }
 
-        when(result){
+        when (result) {
             is State.Success -> {
-                if (weather != null) {
-                    viewModel.sendWeather(weather)
-                }
+
+                viewModel.sendWeather(weather!!)
+
                 findNavController().navigate(R.id.detailedFragment)
             }
-            is State.Error ->{
-                Toast.makeText(requireContext(),"Ошибка",Toast.LENGTH_LONG).show()
+
+            is State.Error -> {
+                Toast.makeText(requireContext(), getText(R.string.error), Toast.LENGTH_LONG).show()
+                binding.progressBar.visibility = View.INVISIBLE
+                binding.button.text = getText(R.string.search_button)
             }
         }
-
     }
 }
