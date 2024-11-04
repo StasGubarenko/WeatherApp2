@@ -7,17 +7,21 @@ import com.bignerdranch.android.weatherapp.domain.repository.CityRepository
 
 class CityRepositoryImp: CityRepository {
 
-    override suspend fun getCities(input: String): MutableList<City> {
+    override suspend fun getCities(input: String): List<City> {
        val response = RetrofitInstance.cityAPI.getCities(
            api = BaseAuth.API_CITY,
            city = input,
-           count = "5"
+           count = COUNT
        )
 
        return if (response.isSuccessful){
-            response.body() ?: mutableListOf()
+            response.body() ?: listOf()
        }else{
-            mutableListOf()
+            listOf()
         }
+    }
+
+    companion object{
+        private const val COUNT = "5"
     }
 }

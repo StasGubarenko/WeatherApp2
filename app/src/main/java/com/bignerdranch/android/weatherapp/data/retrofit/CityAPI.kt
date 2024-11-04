@@ -9,5 +9,9 @@ import retrofit2.http.Query
 interface CityAPI {
 
     @GET("/v1/city")
-    suspend fun getCities(@Header("X-Api-Key") api: String,@Query("name") city: String, @Query("limit") count: String): Response<ArrayList<City>>
+    suspend fun getCities(
+        @Header("X-Api-Key") api: String,
+        @Query("name") city: String,
+        @Query("limit") count: String
+    ): Response<ArrayList<City>>
 }

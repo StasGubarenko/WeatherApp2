@@ -5,12 +5,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
 
+    val cityAPI: CityAPI by lazy {
+        createRetrofit(URL_CITY).create(CityAPI::class.java)
+    }
+
+    val weatherAPI: WeatherAPI by lazy {
+        createRetrofit(URL_WEATHER).create(WeatherAPI::class.java)
+    }
+
     private const val URL_WEATHER = "https://api.weatherapi.com/v1/current.json/"
     private const val URL_CITY = "https://api.api-ninjas.com/v1/city/"
-
-
-    val weatherAPI = createRetrofit(URL_WEATHER).create(WeatherAPI::class.java)
-    val cityAPI = createRetrofit(URL_CITY).create(CityAPI::class.java)
 
     private fun createRetrofit(url: String) : Retrofit{
         return Retrofit.Builder()

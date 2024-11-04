@@ -6,5 +6,7 @@ import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 
 sealed interface State{
     data object Error : State
-    class Success(val weather: Weather) : State
+    data object Success : State
+
+    data object Loading: State
 }

@@ -8,6 +8,7 @@ data class City(
     val longitude: Double,
     val country: String,
     val population: Long,
-    @SerializedName("is_capital") val isCapital: Boolean
+    @SerializedName("is_capital")
+    val isCapital: Boolean
 )
 

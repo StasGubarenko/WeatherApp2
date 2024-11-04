@@ -34,6 +34,7 @@
                 android:layout_marginStart="100dp"
                 android:layout_weight="1"
                 android:dropDownHeight="100dp"
+                android:completionThreshold="1"
                 android:ems="10"
                 android:inputType="text"
                 app:layout_constraintBottom_toBottomOf="parent"

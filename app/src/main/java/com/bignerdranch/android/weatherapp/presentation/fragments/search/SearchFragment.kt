@@ -1,6 +1,5 @@
 package com.bignerdranch.android.weatherapp.presentation.fragments.search
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -12,8 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -32,34 +34,6 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
-    private val textWatcher: TextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            val input = binding.search.text.toString()
-
-            if (input.isNotEmpty()) {
-                lifecycleScope.launch {
-                    lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                        val geographicalFeature = viewModel.loadCities(input = input)
-
-                        val cities = getCities(geographicalFeature)
-
-                        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
-                            requireContext(),
-                            android.R.layout.simple_dropdown_item_1line,
-                            cities
-                        )
-                        binding.search.setAdapter(adapter)
-                    }
-                }
-            }
-        }
-
-        override fun afterTextChanged(s: Editable?) {}
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,31 +42,104 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        binding.search.threshold = 0
-        binding.search.addTextChangedListener(textWatcher)
+        var cities = arrayListOf<String>("Omsk","Tomsk", "Moscow","Mosk")
+
+
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            cities
+        )
+
+        binding.search.setAdapter(adapter)
+
+//        binding.search.addTextChangedListener(
+//            object : TextWatcher {
+//                override fun beforeTextChanged(
+//                    s: CharSequence?,
+//                    start: Int,
+//                    count: Int,
+//                    after: Int
+//                ) {
+//                }
+//
+//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//
+//                    if (s.toString().isNotEmpty()) {
+//                        lifecycleScope.launch {
+//
+//                            val geographicalFeature = viewModel.loadCities(input = s.toString())
+//
+//                            cities = getCities(geographicalFeature)
+//                            Log.d("TESTIM", "Города после получения: ${cities.joinToString()}")
+//
+//                            Log.d("TESTIM", "---------------------------------------")
+//                            Log.d("TESTIM", "До вызова clear cities = ${cities.size}")
+//                            Log.d("TESTIM", "До вызова clear adapter = ${adapter.count}")
+//
+//                            adapter.clear()
+//                            Log.d("TESTIM", "---------------------------------------")
+//
+//                            Log.d("TESTIM", "После вызова clear cities = ${cities.size}")
+//                            Log.d("TESTIM", "После вызова clear adapter = ${adapter.count}")
+//
+//                            adapter.addAll(cities)
+//                            Log.d("TESTIM", "---------------------------------------")
+//                            Log.d(
+//                                "TESTIM",
+//                                "После вызова adapter.addAll(cities) cities = ${cities.size}"
+//                            )
+//                            Log.d(
+//                                "TESTIM",
+//                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
+//                            ) // почему-то здесь 0
+//
+//                            adapter.notifyDataSetChanged()
+//
+//                            Log.d(
+//                                "TESTIM",
+//                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
+//                            )
+//                        }
+//                    }
+//                }
+//
+//                override fun afterTextChanged(s: Editable?) {}
+//            }
+//        )
 
         binding.button.setOnClickListener {
 
             val inputCity = binding.search.text.toString()
 
-            val resultValidate = viewModel.validate(inputCity)
+            val isValid = viewModel.validate(inputCity)
 
 
-            if (resultValidate) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.button.text = ""
+            if (isValid) {
+
 
                 lifecycleScope.launch {
+                    viewModel.loadWeather(city = inputCity)
 
+                    viewModel.isSuccessResponse.collect {
+                        when (it) {
+                            State.Loading ->{
+                                binding.progressBar.isVisible = true
+                                binding.button.text = ""
+                            }
 
-                    try {
-                        val weather = viewModel.loadWeather(city = inputCity)
+                            State.Success -> {
 
-                        handleResponse(weather)
-                    } catch (e: Exception) {
-                        Toast.makeText(requireContext(), "${e.message}", Toast.LENGTH_LONG).show()
-                        binding.progressBar.visibility = View.INVISIBLE
-                        binding.button.text = getText(R.string.search_button)
+                                findNavController().navigate(R.id.detailedFragment)
+                            }
+
+                            State.Error -> {
+                                Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_LONG)
+                                    .show()
+                                binding.progressBar.visibility = View.INVISIBLE
+                                binding.button.text = getText(R.string.search_button)
+                            }
+                        }
                     }
                 }
             } else {
@@ -109,37 +156,13 @@ class SearchFragment : Fragment() {
         _binding = null
     }
 
-    private fun getCities(geographicalFeature: MutableList<City>): ArrayList<String> {
+
+    private fun getCities(geographicalFeature: List<City>): ArrayList<String> {
         val cities = arrayListOf<String>()
 
         for (i in geographicalFeature.indices) {
             cities.add(geographicalFeature[i].name)
         }
-
         return cities
-    }
-
-    private suspend fun handleResponse(weather: Weather?) {
-
-        val result = if (weather != null) {
-            State.Success(weather = weather)
-        } else {
-            State.Error
-        }
-
-        when (result) {
-            is State.Success -> {
-
-                viewModel.sendWeather(weather!!)
-
-                findNavController().navigate(R.id.detailedFragment)
-            }
-
-            is State.Error -> {
-                Toast.makeText(requireContext(), getText(R.string.error), Toast.LENGTH_LONG).show()
-                binding.progressBar.visibility = View.INVISIBLE
-                binding.button.text = getText(R.string.search_button)
-            }
-        }
     }
 }
