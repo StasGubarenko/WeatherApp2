@@ -42,7 +42,7 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        var cities = arrayListOf<String>("Omsk","Tomsk", "Moscow","Mosk")
+        var cities = arrayListOf<String>()
 
 
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
@@ -53,60 +53,60 @@ class SearchFragment : Fragment() {
 
         binding.search.setAdapter(adapter)
 
-//        binding.search.addTextChangedListener(
-//            object : TextWatcher {
-//                override fun beforeTextChanged(
-//                    s: CharSequence?,
-//                    start: Int,
-//                    count: Int,
-//                    after: Int
-//                ) {
-//                }
-//
-//                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//
-//                    if (s.toString().isNotEmpty()) {
-//                        lifecycleScope.launch {
-//
-//                            val geographicalFeature = viewModel.loadCities(input = s.toString())
-//
-//                            cities = getCities(geographicalFeature)
-//                            Log.d("TESTIM", "Города после получения: ${cities.joinToString()}")
-//
-//                            Log.d("TESTIM", "---------------------------------------")
-//                            Log.d("TESTIM", "До вызова clear cities = ${cities.size}")
-//                            Log.d("TESTIM", "До вызова clear adapter = ${adapter.count}")
-//
-//                            adapter.clear()
-//                            Log.d("TESTIM", "---------------------------------------")
-//
-//                            Log.d("TESTIM", "После вызова clear cities = ${cities.size}")
-//                            Log.d("TESTIM", "После вызова clear adapter = ${adapter.count}")
-//
-//                            adapter.addAll(cities)
-//                            Log.d("TESTIM", "---------------------------------------")
-//                            Log.d(
-//                                "TESTIM",
-//                                "После вызова adapter.addAll(cities) cities = ${cities.size}"
-//                            )
-//                            Log.d(
-//                                "TESTIM",
-//                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
-//                            ) // почему-то здесь 0
-//
-//                            adapter.notifyDataSetChanged()
-//
-//                            Log.d(
-//                                "TESTIM",
-//                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
-//                            )
-//                        }
-//                    }
-//                }
-//
-//                override fun afterTextChanged(s: Editable?) {}
-//            }
-//        )
+        binding.search.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+                    if (s.toString().isNotEmpty()) {
+                        lifecycleScope.launch {
+
+                            val geographicalFeature = viewModel.loadCities(input = s.toString())
+
+                            cities = getCities(geographicalFeature)
+                            Log.d("TESTIM", "Города после получения: ${cities.joinToString()}")
+
+                            Log.d("TESTIM", "---------------------------------------")
+                            Log.d("TESTIM", "До вызова clear cities = ${cities.size}")
+                            Log.d("TESTIM", "До вызова clear adapter = ${adapter.count}")
+
+                            adapter.clear()
+                            Log.d("TESTIM", "---------------------------------------")
+
+                            Log.d("TESTIM", "После вызова clear cities = ${cities.size}")
+                            Log.d("TESTIM", "После вызова clear adapter = ${adapter.count}")
+
+                            adapter.addAll(cities)
+                            Log.d("TESTIM", "---------------------------------------")
+                            Log.d(
+                                "TESTIM",
+                                "После вызова adapter.addAll(cities) cities = ${cities.size}"
+                            )
+                            Log.d(
+                                "TESTIM",
+                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
+                            ) // почему-то здесь 0
+
+                            adapter.notifyDataSetChanged()
+
+                            Log.d(
+                                "TESTIM",
+                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
+                            )
+                        }
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            }
+        )
 
         binding.button.setOnClickListener {
 
