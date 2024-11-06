@@ -12,18 +12,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.databinding.FragmentSearchBinding
 import com.bignerdranch.android.weatherapp.domain.models.city.City
-import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
+import com.bignerdranch.android.weatherapp.presentation.fragments.StateCity
+import com.bignerdranch.android.weatherapp.presentation.fragments.StateWeather
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentsViewModelFactory
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentViewModel
 import kotlinx.coroutines.launch
@@ -42,13 +38,13 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        var cities = arrayListOf<String>()
+        var newCities = listOf<String>()
 
 
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
-            cities
+            newCities
         )
 
         binding.search.setAdapter(adapter)
@@ -66,40 +62,31 @@ class SearchFragment : Fragment() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
                     if (s.toString().isNotEmpty()) {
-                        lifecycleScope.launch {
+                        viewLifecycleOwner.lifecycleScope.launch{
 
-                            val geographicalFeature = viewModel.loadCities(input = s.toString())
+                            val cities = viewModel.loadCities(input = s.toString())
 
-                            cities = getCities(geographicalFeature)
-                            Log.d("TESTIM", "Города после получения: ${cities.joinToString()}")
+                            if (cities.isNotEmpty()){
+                                newCities = getCities(cities)
 
-                            Log.d("TESTIM", "---------------------------------------")
-                            Log.d("TESTIM", "До вызова clear cities = ${cities.size}")
-                            Log.d("TESTIM", "До вызова clear adapter = ${adapter.count}")
+                                adapter.clear()
 
-                            adapter.clear()
-                            Log.d("TESTIM", "---------------------------------------")
+                                adapter.addAll(newCities)
 
-                            Log.d("TESTIM", "После вызова clear cities = ${cities.size}")
-                            Log.d("TESTIM", "После вызова clear adapter = ${adapter.count}")
-
-                            adapter.addAll(cities)
-                            Log.d("TESTIM", "---------------------------------------")
-                            Log.d(
-                                "TESTIM",
-                                "После вызова adapter.addAll(cities) cities = ${cities.size}"
-                            )
-                            Log.d(
-                                "TESTIM",
-                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
-                            ) // почему-то здесь 0
-
-                            adapter.notifyDataSetChanged()
-
-                            Log.d(
-                                "TESTIM",
-                                "После вызова adapter.addAll(cities) adapter = ${adapter.count}"
-                            )
+                                adapter.notifyDataSetChanged()
+                            }else{
+                                viewModel.currentCity.collect{
+                                    when(it){
+                                        StateCity.Loading ->{
+                                            //nothing
+                                        }
+                                        StateCity.Error -> {
+                                            Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_LONG)
+                                                .show()
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -114,26 +101,23 @@ class SearchFragment : Fragment() {
 
             val isValid = viewModel.validate(inputCity)
 
-
             if (isValid) {
 
-
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     viewModel.loadWeather(city = inputCity)
 
                     viewModel.isSuccessResponse.collect {
                         when (it) {
-                            State.Loading ->{
+                            StateWeather.Loading -> {
                                 binding.progressBar.isVisible = true
                                 binding.button.text = ""
                             }
 
-                            State.Success -> {
-
+                            StateWeather.Success -> {
                                 findNavController().navigate(R.id.detailedFragment)
                             }
 
-                            State.Error -> {
+                            StateWeather.Error -> {
                                 Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_LONG)
                                     .show()
                                 binding.progressBar.visibility = View.INVISIBLE
@@ -157,8 +141,8 @@ class SearchFragment : Fragment() {
     }
 
 
-    private fun getCities(geographicalFeature: List<City>): ArrayList<String> {
-        val cities = arrayListOf<String>()
+    private fun getCities(geographicalFeature: List<City>): MutableList<String> {
+        val cities = mutableListOf<String>()
 
         for (i in geographicalFeature.indices) {
             cities.add(geographicalFeature[i].name)
