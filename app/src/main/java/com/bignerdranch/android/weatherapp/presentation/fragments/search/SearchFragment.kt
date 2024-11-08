@@ -4,12 +4,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -18,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.databinding.FragmentSearchBinding
 import com.bignerdranch.android.weatherapp.domain.models.city.City
+import com.bignerdranch.android.weatherapp.presentation.CustomAdapter
 import com.bignerdranch.android.weatherapp.presentation.fragments.StateCity
 import com.bignerdranch.android.weatherapp.presentation.fragments.StateWeather
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentsViewModelFactory
@@ -38,10 +37,9 @@ class SearchFragment : Fragment() {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        var newCities = listOf<String>()
+        var newCities = mutableListOf<String>()
 
-
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+        val adapter = CustomAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
             newCities
@@ -73,7 +71,6 @@ class SearchFragment : Fragment() {
 
                                 adapter.addAll(newCities)
 
-                                adapter.notifyDataSetChanged()
                             }else{
                                 viewModel.currentCity.collect{
                                     when(it){
