@@ -35,14 +35,10 @@ class SearchFragment : Fragment() {
     ): View? {
 
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        val view = binding.root
-
-        var newCities = mutableListOf<String>()
 
         val adapter = CustomAdapter(
             requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            newCities
+            android.R.layout.simple_dropdown_item_1line
         )
 
         binding.search.setAdapter(adapter)
@@ -60,27 +56,31 @@ class SearchFragment : Fragment() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
                     if (s.toString().isNotEmpty()) {
-                        viewLifecycleOwner.lifecycleScope.launch{
+                        viewLifecycleOwner.lifecycleScope.launch {
 
-                            val cities = viewModel.loadCities(input = s.toString())
+                            viewModel.loadCities(input = s.toString())
 
-                            if (cities.isNotEmpty()){
-                                newCities = getCities(cities)
+                            viewModel.isSuccessResponseCity.collect {
+                                when (it) {
+                                    StateCity.Loading -> Unit
 
-                                adapter.clear()
+                                    StateCity.Success -> {
+                                        val newCities = getCities(viewModel.listCity.value)
 
-                                adapter.addAll(newCities)
+                                        adapter.clear()
 
-                            }else{
-                                viewModel.currentCity.collect{
-                                    when(it){
-                                        StateCity.Loading ->{
-                                            //nothing
-                                        }
-                                        StateCity.Error -> {
-                                            Toast.makeText(requireContext(), R.string.error, Toast.LENGTH_LONG)
-                                                .show()
-                                        }
+                                        adapter.update(outerObject = newCities)
+
+                                        adapter.addAll(newCities)
+                                    }
+
+                                    StateCity.Error -> {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            R.string.error,
+                                            Toast.LENGTH_LONG
+                                        )
+                                            .show()
                                     }
                                 }
                             }
@@ -103,7 +103,7 @@ class SearchFragment : Fragment() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     viewModel.loadWeather(city = inputCity)
 
-                    viewModel.isSuccessResponse.collect {
+                    viewModel.isSuccessResponseWeather.collect {
                         when (it) {
                             StateWeather.Loading -> {
                                 binding.progressBar.isVisible = true
@@ -129,7 +129,7 @@ class SearchFragment : Fragment() {
             }
         }
 
-        return view
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -138,7 +138,7 @@ class SearchFragment : Fragment() {
     }
 
 
-    private fun getCities(geographicalFeature: List<City>): MutableList<String> {
+    private fun getCities(geographicalFeature: List<City>): List<String> {
         val cities = mutableListOf<String>()
 
         for (i in geographicalFeature.indices) {

@@ -8,15 +8,23 @@ import android.widget.Filter
 class CustomAdapter(
     context: Context,
     resource: Int,
-    private var objects: MutableList<String>
-) : ArrayAdapter<String>(context,resource,objects){
+) : ArrayAdapter<String>(context,resource){
 
+   private var initObjects : MutableList<String>
+
+    init {
+        initObjects = mutableListOf()
+    }
+
+    fun update(outerObject: List<String>){
+        initObjects = outerObject.toMutableList()
+    }
     override fun getCount(): Int {
-        return objects.size
+        return initObjects.size
     }
 
     override fun getItem(index: Int): String? {
-        return objects[index]
+        return initObjects[index]
     }
 
     override fun getFilter(): Filter {
@@ -25,10 +33,10 @@ class CustomAdapter(
                 val filterResults = FilterResults()
                 if (constraint != null) {
 
-                    objects.add(constraint.toString())
+                    initObjects.add(constraint.toString())
 
-                    filterResults.values = objects
-                    filterResults.count = objects.size
+                    filterResults.values = initObjects
+                    filterResults.count = initObjects.size
                 }
                 return filterResults
             }

@@ -22,47 +22,52 @@ class FragmentViewModel(
     private val _resultWeather = MutableSharedFlow<Weather>(replay = 1)
     val resultWeather: SharedFlow<Weather> get() = _resultWeather
 
-    private val _isSuccessResponse = MutableStateFlow<StateWeather>(StateWeather.Loading)
+    private val _isSuccessResponseWeather = MutableStateFlow<StateWeather>(StateWeather.Loading)
+    val isSuccessResponseWeather: StateFlow<StateWeather> = _isSuccessResponseWeather
 
-    val isSuccessResponse: StateFlow<StateWeather> = _isSuccessResponse
+    private val _isSuccessResponseCity = MutableStateFlow<StateCity>(StateCity.Loading)
+    val isSuccessResponseCity: StateFlow<StateCity> = _isSuccessResponseCity
 
-    private val _currentCities = MutableStateFlow<StateCity>(StateCity.Loading)
-    val currentCity: StateFlow<StateCity> = _currentCities
+    private val _listCity = MutableStateFlow<List<City>>(listOf())
+    val listCity = _listCity
 
-    suspend fun sendWeather(weather: Weather) {
+    private suspend fun sendWeather(weather: Weather) {
         _resultWeather.emit(weather)
     }
 
-    suspend fun loadCities(input: String): List<City> {
-      _currentCities.value = StateCity.Loading
+    suspend fun loadCities(input: String){
 
-        var cities: List<City> = listOf()
+        _isSuccessResponseCity.value = StateCity.Loading
 
         try {
-            cities = loadCityUseCase.loadCities(input)
+         val cities = loadCityUseCase.loadCities(input)
 
+            if (cities.isNotEmpty()){
+                listCity.value = cities
+                _isSuccessResponseCity.value = StateCity.Success
+            }else{
+                _isSuccessResponseCity.value = StateCity.Error
+            }
         }catch (e : Exception){
-            _currentCities.value = StateCity.Error
+            _isSuccessResponseCity.value = StateCity.Error
         }
-
-        return cities
     }
 
     suspend fun loadWeather(city: String) {
 
-        _isSuccessResponse.value = StateWeather.Loading
+        _isSuccessResponseWeather.value = StateWeather.Loading
 
         try {
             val weather = loadWeatherUseCase.execute(city = city)
 
             if (weather != null) {
                 sendWeather(weather = weather)
-                _isSuccessResponse.value = StateWeather.Success
+                _isSuccessResponseWeather.value = StateWeather.Success
             } else {
-                _isSuccessResponse.value = StateWeather.Error
+                _isSuccessResponseWeather.value = StateWeather.Error
             }
         } catch (e: Exception) {
-            _isSuccessResponse.value = StateWeather.Error
+            _isSuccessResponseWeather.value = StateWeather.Error
         }
     }
 
