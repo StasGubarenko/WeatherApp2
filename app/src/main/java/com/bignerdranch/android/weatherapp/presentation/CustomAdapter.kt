@@ -19,6 +19,7 @@ class CustomAdapter(
     fun update(outerObject: List<String>){
         initObjects = outerObject.toMutableList()
     }
+
     override fun getCount(): Int {
         return initObjects.size
     }
