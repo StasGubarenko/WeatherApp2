@@ -11,6 +11,7 @@ class CustomAdapter(
 ) : ArrayAdapter<String>(context,resource){
 
    private var initObjects : MutableList<String>
+   private var isValidation: Boolean = false
 
     init {
         initObjects = mutableListOf()
@@ -32,7 +33,7 @@ class CustomAdapter(
         return object : Filter() {
              override fun performFiltering(constraint: CharSequence?): FilterResults? {
                 val filterResults = FilterResults()
-                if (constraint != null) {
+                if (constraint != null && isValidation) {
 
                     initObjects.add(constraint.toString())
 
@@ -50,5 +51,9 @@ class CustomAdapter(
                 }
             }
         }
+    }
+
+    fun getValidation(isValidation: Boolean){
+        this.isValidation = isValidation
     }
 }

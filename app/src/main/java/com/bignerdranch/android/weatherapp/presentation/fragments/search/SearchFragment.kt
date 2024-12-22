@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -53,7 +54,6 @@ class SearchFragment : Fragment() {
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    Log.d("DEBUG22","onTextChanged user input = ${s.toString()}")
                     viewModel.loadCities(s.toString())
                     city = s.toString()
                 }
@@ -72,11 +72,8 @@ class SearchFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        Log.d("DEBUG22","onStart")
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.collect {state ->
-
-                Log.d("DEBUG22","$state")
                 when(state){
                     is State.Loading ->{
                      binding.progressBar.isVisible  = state.isVisible
@@ -86,12 +83,15 @@ class SearchFragment : Fragment() {
                     is State.Content ->{
                        val cities = viewModel.state.value as State.Content
 
+                        adapter.getValidation(state.isValidateInputText)
+
                         if (state.isValidateInputText){
                             binding.search.setAdapter(adapter)
                             adapter.clear()
                             adapter.update(cities.cities)
                             adapter.addAll(cities.cities)
                         }
+
 
                         if (state.searchHint != null && state.searchColor != null){
                             binding.search.error = getString(state.searchHint)
@@ -122,5 +122,5 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
+

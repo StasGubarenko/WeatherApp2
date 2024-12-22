@@ -10,11 +10,12 @@ import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 sealed interface State {
 
     data class Content(
+        val currentText: String,
         val cities: List<String>,
         val searchColor: Int?,
         val searchHint: Int?,
         val weather: Weather?,
-        val isValidateInputText: Boolean
+        var isValidateInputText: Boolean
     ) : State
 
     data class Loading(
