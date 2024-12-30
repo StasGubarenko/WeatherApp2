@@ -6,4 +6,6 @@
     <string name="back_button">Back</string>
     <string name="error">Что-то пошло не так</string>
     <string name="error_message">Latin letters only</string>
+    <string name="button_loader"> </string>
+    <string name="empty_space"> </string>
 </resources>
