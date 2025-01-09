@@ -3,8 +3,6 @@ package com.bignerdranch.android.weatherapp.presentation.fragments.search
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +15,8 @@ import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.databinding.FragmentSearchBinding
 import com.bignerdranch.android.weatherapp.presentation.CustomAdapter
-import com.bignerdranch.android.weatherapp.presentation.fragments.News
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
+import com.bignerdranch.android.weatherapp.presentation.state.News
+import com.bignerdranch.android.weatherapp.presentation.state.State
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentsViewModelFactory
 import com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel.FragmentViewModel
 import kotlinx.coroutines.launch

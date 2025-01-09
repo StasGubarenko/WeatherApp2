@@ -13,5 +13,5 @@ interface CityAPI {
         @Header("X-Api-Key") api: String,
         @Query("name") city: String,
         @Query("limit") count: String
-    ): Response<ArrayList<City>>
+    ): Response<List<City>>
 }

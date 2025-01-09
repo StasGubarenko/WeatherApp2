@@ -1,7 +1,6 @@
 package com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel
 
 import android.graphics.Color
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bignerdranch.android.weatherapp.R
@@ -9,10 +8,8 @@ import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadCityUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
-import com.bignerdranch.android.weatherapp.presentation.fragments.News
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.bignerdranch.android.weatherapp.presentation.state.News
+import com.bignerdranch.android.weatherapp.presentation.state.State
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
