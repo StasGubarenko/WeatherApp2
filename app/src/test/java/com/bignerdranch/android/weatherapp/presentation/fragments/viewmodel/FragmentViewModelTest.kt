@@ -12,6 +12,10 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.domain.models.city.City
+import com.bignerdranch.android.weatherapp.domain.models.weather.Condition
+import com.bignerdranch.android.weatherapp.domain.models.weather.Current
+import com.bignerdranch.android.weatherapp.domain.models.weather.Location
+import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 import com.bignerdranch.android.weatherapp.presentation.state.News
 import com.bignerdranch.android.weatherapp.rule.MainDispatcherRule
 import junit.framework.TestCase.assertFalse
@@ -30,6 +34,9 @@ import org.junit.Rule
 import java.lang.RuntimeException
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
+import org.junit.Before
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
 class FragmentViewModelTest{
 
@@ -184,6 +191,7 @@ runTest {
     @Test
     fun test_state_loading_weather_when_loadWeatherUseCase_has_exception(){
         runTest {
+
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
             val validationFieldUseCase: ValidationFieldUseCase = mock()
@@ -203,10 +211,11 @@ runTest {
 
             mockFragmentViewModel.loadWeather(city)
 
-            advanceUntilIdle()
-
             val updateStateNews = mockFragmentViewModel.news.first()
+
             val updateState = mockFragmentViewModel.state.value as State.Loading
+
+            advanceUntilIdle()
 
             assertTrue(updateStateNews is News.ShowError)
             assertFalse(updateState.isVisible)
@@ -214,4 +223,137 @@ runTest {
         }
 
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_state_loading_weather_when_weather_is_null(){
+        runTest {
+
+            val loadCityUseCase: LoadCityUseCase = mock()
+            val loadWeatherUseCase: LoadWeatherUseCase = mock()
+            val validationFieldUseCase: ValidationFieldUseCase = mock()
+
+            val mockFragmentViewModel = FragmentViewModel(
+                loadCityUseCase = loadCityUseCase,
+                loadWeatherUseCase = loadWeatherUseCase,
+                validationFieldUseCase = validationFieldUseCase
+            )
+
+            val city = "Omsk"
+            val expectedText = R.string.search_button
+
+            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+
+            `when`(loadWeatherUseCase.execute(city = city)).thenReturn(null)
+
+            mockFragmentViewModel.loadWeather(city)
+
+            val updateStateNews = mockFragmentViewModel.news.first()
+
+            val updateState = mockFragmentViewModel.state.value as State.Loading
+
+            advanceUntilIdle()
+
+            assertTrue(updateStateNews is News.ShowError)
+            assertFalse(updateState.isVisible)
+            assertEquals(updateState.buttonText, expectedText)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_state_loading_weather_when_weather_is_not_null(){
+        runTest {
+
+            val loadCityUseCase: LoadCityUseCase = mock()
+            val loadWeatherUseCase: LoadWeatherUseCase = mock()
+            val validationFieldUseCase: ValidationFieldUseCase = mock()
+
+            val mockFragmentViewModel = FragmentViewModel(
+                loadCityUseCase = loadCityUseCase,
+                loadWeatherUseCase = loadWeatherUseCase,
+                validationFieldUseCase = validationFieldUseCase
+            )
+
+            val city = "Omsk"
+            val expectedWeather = Weather(
+                Location(
+                    name = "Omsk",
+                    region = "Omsk"
+                ),
+                Current(
+                    condition = Condition(
+                        text = "text",
+                        icon = "path"
+                    ),
+                    temp_c = 4.0
+                )
+            )
+
+            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+
+            `when`(loadWeatherUseCase.execute(city = city)).thenReturn(expectedWeather)
+
+            mockFragmentViewModel.loadWeather(city)
+
+            val updateStateNews = mockFragmentViewModel.news.first()
+
+            val updateState = mockFragmentViewModel.state.value as State.Content
+
+            advanceUntilIdle()
+
+            assertTrue(updateStateNews is News.NavigateForward)
+            assertEquals(updateState.weather, expectedWeather)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_finally(){
+        runTest {
+            val loadCityUseCase: LoadCityUseCase = mock()
+            val loadWeatherUseCase: LoadWeatherUseCase = mock()
+            val validationFieldUseCase: ValidationFieldUseCase = mock()
+
+            val mockFragmentViewModel = FragmentViewModel(
+                loadCityUseCase = loadCityUseCase,
+                loadWeatherUseCase = loadWeatherUseCase,
+                validationFieldUseCase = validationFieldUseCase
+            )
+
+            val city = "Omsk"
+            val expectedWeather = Weather(
+                Location(
+                    name = "Omsk",
+                    region = "Omsk"
+                ),
+                Current(
+                    condition = Condition(
+                        text = "text",
+                        icon = "path"
+                    ),
+                    temp_c = 4.0
+                )
+            )
+
+
+            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+
+            `when`(loadWeatherUseCase.execute(city = city)).thenReturn(expectedWeather)
+
+            mockFragmentViewModel.loadWeather(city)
+
+            advanceUntilIdle()
+
+
+            val updateState = mockFragmentViewModel.state.value as State.Content
+
+            assertEquals(updateState.weather, expectedWeather)
+        }
+    }
+
+
+
+
+
 }

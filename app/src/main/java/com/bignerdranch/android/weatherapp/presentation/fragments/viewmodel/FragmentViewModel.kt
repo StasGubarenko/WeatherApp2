@@ -90,26 +90,33 @@ class FragmentViewModel(
                 var weather : Weather? = null
                 try {
                      weather = loadWeatherUseCase.execute(city = city)
+
                     if (weather != null) {
+                        println("Значение перед _state.value = ${_state.value} ")
                         _state.value = currentState.copy(weather = weather)
+                        println("Значение после _state.value = ${_state.value} ")
+                        println("Значение перед _news = ${_news} ")
                         _news.emit(News.NavigateForward)
+                        println("Значение после _news = ${_news} ")
                     } else {
-                        _news.emit(News.ShowError)
                         _state.value = State.Loading(
                             isVisible = false,
                             buttonText = R.string.search_button
                         )
+                        _news.emit(News.ShowError)
                     }
                 } catch (e: Exception) {
-                    _news.emit(News.ShowError)
                     _state.value = State.Loading(
                         isVisible = false,
                         buttonText = R.string.search_button
                     )
+                    _news.emit(News.ShowError)
                 }finally {
+                    println("FINALLY Значение перед _state.value = ${_state.value} ")
                     _state.value = currentState.copy(
                         weather = weather
                     )
+                    println("FINALLY Значение после _state.value = ${_state.value} ")
                 }
             }
         }
