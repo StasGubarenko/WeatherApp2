@@ -23,20 +23,12 @@ import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.runBlockingTestOnTestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Ignore
+
 import org.junit.Rule
 import java.lang.RuntimeException
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
-import org.junit.Before
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+
 
 class FragmentViewModelTest{
 
@@ -66,7 +58,7 @@ class FragmentViewModelTest{
 
            val updateState = fragmentViewModel.state.value as State.Content
 
-           assertTrue(updateState.currentText == input)
+           assertEquals(updateState.currentText, input)
            assertEquals(expectedText, updateState.searchHint)
            assertEquals(expectedColor, updateState.searchColor)
            assertFalse(updateState.isValidateInputText)
