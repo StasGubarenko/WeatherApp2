@@ -13,10 +13,10 @@ import retrofit2.Response
 class CityRepositoryImplTest{
 
     @Test
-    fun test_return_body_when_response_is_successful_and_body_is_not_empty() = runBlocking{
+    fun getCities_WhenResponseIsSuccessAndNotEmpty_ReturnListOfCities() = runBlocking{
+        //setup
         val mockCityAPI : CityAPI = mock()
         val сityRepositoryImpl = CityRepositoryImpl(cityAPI = mockCityAPI)
-
         val expectedResponse = Response.success(listOf(City(
             name = "Omsk",
             latitude = 44.3,
@@ -25,42 +25,60 @@ class CityRepositoryImplTest{
             population = 33L ,
             isCapital = false
         )))
+        `when`(mockCityAPI.getCities(
+            api = anyString(),
+            city = anyString(),
+            count = anyString()))
+            .thenReturn(expectedResponse)
 
-        `when`(mockCityAPI.getCities(anyString(), anyString(), anyString())).thenReturn(expectedResponse)
+        //act
+        val actual = сityRepositoryImpl.getCities(inputNameOfCity = INPUT_CITY)
 
-        val actual = сityRepositoryImpl.getCities("Omsk")
-
+        //assert
         assertEquals(expectedResponse.body(), actual)
     }
 
     @Test
-    fun test_return_list_when_response_is_successful_and_body_is_empty() = runBlocking {
+    fun getCities_WhenResponseIsSuccessAndBodyIsEmpty_ReturnEmptyListOfCities() = runBlocking {
+        //setup
         val mockCityAPI : CityAPI = mock()
-
-        val cityRepositoryImpl = CityRepositoryImpl(mockCityAPI)
-
+        val cityRepositoryImpl = CityRepositoryImpl(cityAPI = mockCityAPI)
         val expectedResponse = Response.success(listOf<City>())
+        `when`(mockCityAPI.getCities(
+            api = anyString(),
+            city = anyString(),
+            count = anyString()))
+            .thenReturn(expectedResponse)
 
-        `when`(mockCityAPI.getCities(anyString(), anyString(), anyString())).thenReturn(expectedResponse)
+        //act
+        val actual = cityRepositoryImpl.getCities(inputNameOfCity = INPUT_CITY)
 
-        val actual = cityRepositoryImpl.getCities("Omsk")
-
+        //assert
         assertEquals(expectedResponse.body(), actual)
     }
 
     @Test
-    fun test_return_list_when_response_is_not_successful() = runBlocking {
+    fun getCities_WhenResponseIsNotSuccess_ReturnEmptyListOfCities() = runBlocking {
+        //setup
         val mockCityAPI: CityAPI = mock()
         val mockCityRepositoryImpl = CityRepositoryImpl(cityAPI = mockCityAPI)
-
         val expected = listOf<List<City>>()
-
         val test = Response.success(listOf<City>())
+        `when`(mockCityAPI.getCities(
+            api = anyString(),
+            city = anyString(),
+            count = anyString()))
+            .thenReturn(test)
 
-        `when`(mockCityAPI.getCities(anyString(), anyString(), anyString())).thenReturn(test)
+        //act
+        val actual = mockCityRepositoryImpl.getCities(inputNameOfCity = EMPTY_INPUT)
 
-        val actual = mockCityRepositoryImpl.getCities("")
+        //assert
+        assertEquals(expected, actual)
+    }
 
-        assertEquals(expected,actual)
+    private companion object {
+        private const val INPUT_CITY = "Omsk"
+        private const val EMPTY_INPUT = ""
     }
 }

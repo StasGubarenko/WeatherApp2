@@ -4,7 +4,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
 
-class ValidationFieldUseCaseTest{
+class ValidateFieldUseCaseTest{
 
     @Test
     fun test_input_lowercase_latin_letter(){
@@ -92,8 +92,8 @@ class ValidationFieldUseCaseTest{
     }
 
     private fun general(input: String, isValid : Boolean){
-        val validationFieldUseCase = ValidationFieldUseCase()
-        val actual = validationFieldUseCase.validate(input)
+        val validateFieldUseCase = ValidateFieldUseCase()
+        val actual = validateFieldUseCase.validate(input)
         if (isValid){
             assertTrue(actual)
         }else{

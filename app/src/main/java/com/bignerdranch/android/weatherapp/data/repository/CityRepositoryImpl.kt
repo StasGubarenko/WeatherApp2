@@ -1,7 +1,6 @@
 package com.bignerdranch.android.weatherapp.data.repository
 
 import com.bignerdranch.android.weatherapp.data.retrofit.CityAPI
-import com.bignerdranch.android.weatherapp.data.retrofit.RetrofitInstance
 import com.bignerdranch.android.weatherapp.data.util.BaseAuth
 import com.bignerdranch.android.weatherapp.domain.models.city.City
 import com.bignerdranch.android.weatherapp.domain.repository.CityRepository
@@ -10,10 +9,10 @@ class CityRepositoryImpl(
     private val cityAPI: CityAPI
 ): CityRepository {
 
-    override suspend fun getCities(input: String): List<City> {
+    override suspend fun getCities(inputNameOfCity: String): List<City> {
        val response = cityAPI.getCities(
            api = BaseAuth.API_CITY,
-           city = input,
+           city = inputNameOfCity,
            count = COUNT
        )
 

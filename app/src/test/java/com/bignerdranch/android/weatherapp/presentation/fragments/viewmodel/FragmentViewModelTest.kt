@@ -3,7 +3,7 @@ package com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel
 import android.graphics.Color
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadCityUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
-import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
+import com.bignerdranch.android.weatherapp.domain.usecase.ValidateFieldUseCase
 import com.bignerdranch.android.weatherapp.presentation.state.State
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -40,19 +40,19 @@ class FragmentViewModelTest{
     fun test_change_state_content_when_validate_is_false_and_input_is_isNotEmpty(){
         val loadCityUseCase: LoadCityUseCase = mock()
         val loadWeatherUseCase: LoadWeatherUseCase = mock()
-        val validationFieldUseCase: ValidationFieldUseCase = mock()
+        val validateFieldUseCase: ValidateFieldUseCase = mock()
 
         val fragmentViewModel = FragmentViewModel(
             loadCityUseCase = loadCityUseCase,
             loadWeatherUseCase = loadWeatherUseCase,
-            validationFieldUseCase = validationFieldUseCase
+            validateFieldUseCase = validateFieldUseCase
         )
 
         val input = "+"
         val expectedText = R.string.error_message
         val expectedColor = Color.RED
 
-          `when`(validationFieldUseCase.validate(input)).thenReturn(false)
+          `when`(validateFieldUseCase.validate(input)).thenReturn(false)
 
            fragmentViewModel.loadCities(input)
 
@@ -68,17 +68,17 @@ class FragmentViewModelTest{
     fun test_change_state_content_when_validate_is_false_and_input_is_Empty(){
         val loadCityUseCase: LoadCityUseCase = mock()
         val loadWeatherUseCase: LoadWeatherUseCase = mock()
-        val validationFieldUseCase: ValidationFieldUseCase = mock()
+        val validateFieldUseCase: ValidateFieldUseCase = mock()
 
         val mockFragmentViewModel = FragmentViewModel(
             loadCityUseCase = loadCityUseCase,
             loadWeatherUseCase = loadWeatherUseCase,
-            validationFieldUseCase = validationFieldUseCase
+            validateFieldUseCase = validateFieldUseCase
         )
 
         val input = ""
 
-        `when`(validationFieldUseCase.validate(input)).thenReturn(false)
+        `when`(validateFieldUseCase.validate(input)).thenReturn(false)
 
         mockFragmentViewModel.loadCities(input)
 
@@ -96,12 +96,12 @@ class FragmentViewModelTest{
 runTest {
     val loadCityUseCase: LoadCityUseCase = mock()
     val loadWeatherUseCase: LoadWeatherUseCase = mock()
-    val validationFieldUseCase: ValidationFieldUseCase = mock()
+    val validateFieldUseCase: ValidateFieldUseCase = mock()
 
     val fragmentViewModel = FragmentViewModel(
         loadCityUseCase = loadCityUseCase,
         loadWeatherUseCase = loadWeatherUseCase,
-        validationFieldUseCase = validationFieldUseCase
+        validateFieldUseCase = validateFieldUseCase
     )
 
     val input = "Omsk"
@@ -114,11 +114,11 @@ runTest {
         isCapital = false
     ))
 
-    `when`(validationFieldUseCase.validate(input)).thenReturn(true)
+    `when`(validateFieldUseCase.validate(input)).thenReturn(true)
     `when`(loadCityUseCase.loadCities(input)).thenReturn(expectedResponse)
 
     fragmentViewModel.loadCities(input)
-    advanceUntilIdle()
+          advanceUntilIdle()
     val updateState = fragmentViewModel.state.value as State.Content
 
     assertTrue(updateState.currentText == input)
@@ -132,17 +132,17 @@ runTest {
         runTest {
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
-            val validationFieldUseCase: ValidationFieldUseCase = mock()
+            val validateFieldUseCase: ValidateFieldUseCase = mock()
 
             val fragmentViewModel = FragmentViewModel(
                 loadCityUseCase = loadCityUseCase,
                 loadWeatherUseCase = loadWeatherUseCase,
-                validationFieldUseCase = validationFieldUseCase
+                validateFieldUseCase = validateFieldUseCase
             )
 
             val input = "Omsk"
 
-            `when`(validationFieldUseCase.validate(input)).thenReturn(true)
+            `when`(validateFieldUseCase.validate(input)).thenReturn(true)
 
             `when`(loadCityUseCase.loadCities(input)).thenThrow(RuntimeException())
 
@@ -157,17 +157,17 @@ runTest {
     fun test_state_loading_weather_when_currentState_is_State_Content_and_validate_is_true() {
         val loadCityUseCase: LoadCityUseCase = mock()
         val loadWeatherUseCase: LoadWeatherUseCase = mock()
-        val validationFieldUseCase: ValidationFieldUseCase = mock()
+        val validateFieldUseCase: ValidateFieldUseCase = mock()
 
         val mockFragmentViewModel = FragmentViewModel(
             loadCityUseCase = loadCityUseCase,
             loadWeatherUseCase = loadWeatherUseCase,
-            validationFieldUseCase = validationFieldUseCase
+            validateFieldUseCase = validateFieldUseCase
         )
 
         val input = "Omsk"
         val expectTextOnButton = R.string.button_loader
-        `when`(validationFieldUseCase.validate(input)).thenReturn(true)
+        `when`(validateFieldUseCase.validate(input)).thenReturn(true)
 
         mockFragmentViewModel.loadWeather(input)
 
@@ -186,18 +186,18 @@ runTest {
 
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
-            val validationFieldUseCase: ValidationFieldUseCase = mock()
+            val validateFieldUseCase: ValidateFieldUseCase = mock()
 
             val mockFragmentViewModel = FragmentViewModel(
                 loadCityUseCase = loadCityUseCase,
                 loadWeatherUseCase = loadWeatherUseCase,
-                validationFieldUseCase = validationFieldUseCase
+                validateFieldUseCase = validateFieldUseCase
             )
 
             val city = "Omsk"
             val expectedText = R.string.search_button
 
-            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+            `when`(validateFieldUseCase.validate(city)).thenReturn(true)
 
             `when`(loadWeatherUseCase.execute(city = city)).thenThrow(RuntimeException())
 
@@ -223,18 +223,18 @@ runTest {
 
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
-            val validationFieldUseCase: ValidationFieldUseCase = mock()
+            val validateFieldUseCase: ValidateFieldUseCase = mock()
 
             val mockFragmentViewModel = FragmentViewModel(
                 loadCityUseCase = loadCityUseCase,
                 loadWeatherUseCase = loadWeatherUseCase,
-                validationFieldUseCase = validationFieldUseCase
+                validateFieldUseCase = validateFieldUseCase
             )
 
             val city = "Omsk"
             val expectedText = R.string.search_button
 
-            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+            `when`(validateFieldUseCase.validate(city)).thenReturn(true)
 
             `when`(loadWeatherUseCase.execute(city = city)).thenReturn(null)
 
@@ -259,12 +259,12 @@ runTest {
 
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
-            val validationFieldUseCase: ValidationFieldUseCase = mock()
+            val validateFieldUseCase: ValidateFieldUseCase = mock()
 
             val mockFragmentViewModel = FragmentViewModel(
                 loadCityUseCase = loadCityUseCase,
                 loadWeatherUseCase = loadWeatherUseCase,
-                validationFieldUseCase = validationFieldUseCase
+                validateFieldUseCase = validateFieldUseCase
             )
 
             val city = "Omsk"
@@ -282,7 +282,7 @@ runTest {
                 )
             )
 
-            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+            `when`(validateFieldUseCase.validate(city)).thenReturn(true)
 
             `when`(loadWeatherUseCase.execute(city = city)).thenReturn(expectedWeather)
 
@@ -305,12 +305,12 @@ runTest {
         runTest {
             val loadCityUseCase: LoadCityUseCase = mock()
             val loadWeatherUseCase: LoadWeatherUseCase = mock()
-            val validationFieldUseCase: ValidationFieldUseCase = mock()
+            val validateFieldUseCase: ValidateFieldUseCase = mock()
 
             val mockFragmentViewModel = FragmentViewModel(
                 loadCityUseCase = loadCityUseCase,
                 loadWeatherUseCase = loadWeatherUseCase,
-                validationFieldUseCase = validationFieldUseCase
+                validateFieldUseCase = validateFieldUseCase
             )
 
             val city = "Omsk"
@@ -329,7 +329,7 @@ runTest {
             )
 
 
-            `when`(validationFieldUseCase.validate(city)).thenReturn(true)
+            `when`(validateFieldUseCase.validate(city)).thenReturn(true)
 
             `when`(loadWeatherUseCase.execute(city = city)).thenReturn(expectedWeather)
 
@@ -337,15 +337,9 @@ runTest {
 
             advanceUntilIdle()
 
-
             val updateState = mockFragmentViewModel.state.value as State.Content
 
             assertEquals(updateState.weather, expectedWeather)
         }
     }
-
-
-
-
-
 }
