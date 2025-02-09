@@ -9,6 +9,7 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.ArgumentMatchers.eq
+import org.mockito.InjectMocks
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -67,12 +68,12 @@ class CityRepositoryImplTest{
         val mockCityAPI: CityAPI = mock()
         val mockCityRepositoryImpl = CityRepositoryImpl(cityAPI = mockCityAPI)
         val expected = listOf<List<City>>()
-        val test = Response.success(listOf<City>())
+        val mockExpected = Response.success(listOf<City>())
         `when`(mockCityAPI.getCities(
             api = anyString(),
             city = anyString(),
             count = anyString()))
-            .thenReturn(test)
+            .thenReturn(mockExpected)
 
         //act
         val actual = mockCityRepositoryImpl.getCities(inputNameOfCity = EMPTY_INPUT)
@@ -84,26 +85,36 @@ class CityRepositoryImplTest{
     //Согласен, название не соответствует шаблону.
     @Test
     fun getCities_сheckInputParametersInMethod() = runBlocking {
-        //setup
-        val mockCityAPI : CityAPI = mock()
-        val cityRepositoryImpl = CityRepositoryImpl(cityAPI = mockCityAPI)
-        val expectedResponse = Response.success(listOf<City>())
-        `when`(mockCityAPI.getCities(
-            api = eq(BaseAuth.API_CITY),
-            city = anyString(),
-            count = eq(COUNT))
-        )
-            .thenReturn(expectedResponse)
 
-        //act
-        cityRepositoryImpl.getCities(inputNameOfCity = INPUT_CITY)
+        val mockCityAPI : CityAPI = mock()
+
+        val expectedResponse = Response.success(listOf(City(
+            name = "Moscow",
+            latitude = 44.3,
+            longitude = 44.3,
+            country = "Russia",
+            population = 33L ,
+            isCapital = false
+        )))
+
+        `when`(mockCityAPI.getCities(
+            anyString(),
+            anyString(),
+            anyString()
+        )).thenReturn(expectedResponse)
+
 
         //capture
         val apiCaptor = ArgumentCaptor.forClass(String::class.java)
         val cityCaptor = ArgumentCaptor.forClass(String::class.java)
         val countCaptor = ArgumentCaptor.forClass(String::class.java)
 
-        //assert
+        mockCityAPI.getCities(
+            api = BaseAuth.API_CITY,
+            city = INPUT_CITY,
+            count = COUNT
+        )
+
         verify(mockCityAPI).getCities(
             api = apiCaptor.capture(),
             city = cityCaptor.capture(),
@@ -114,10 +125,38 @@ class CityRepositoryImplTest{
         assertEquals(COUNT, countCaptor.value)
     }
 
+    @Test
+    fun test() = runBlocking{
+
+        val mockCityAPI : CityAPI = mock()
+
+        val cityRepository = CityRepositoryImpl(mockCityAPI)
+        val expectedResponse = Response.success(listOf<City>())
+        `when`(mockCityAPI.getCities(
+            api = BaseAuth.API_CITY,
+            city = INPUT_CITY,
+            count = COUNT
+        ))
+            .thenReturn(expectedResponse)
+
+        cityRepository.getCities(inputNameOfCity = INPUT_CITY)
+
+        val argumentApi = ArgumentCaptor.forClass(String::class.java)
+        val argumentCity = ArgumentCaptor.forClass(String::class.java)
+        val argumentCount = ArgumentCaptor.forClass(String::class.java)
+
+        verify(mockCityAPI).getCities(
+            api = argumentApi.capture(),
+            city = argumentCity.capture(),
+            count = argumentCount.capture()
+        )
+
+        assertEquals(INPUT_CITY, argumentCity.value)
+    }
+
     private companion object {
-        private const val INPUT_CITY = "Omsk"
+        private const val INPUT_CITY = "Moscow"
         private const val EMPTY_INPUT = ""
         private const val COUNT = "5"
-        private const val API_CITY = "LkWaXCHTJcx7o4/gHxBVEQ==Q82fPDjRaKVS1lHK"
     }
 }
