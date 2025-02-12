@@ -1,4 +1,4 @@
-package com.bignerdranch.android.weatherapp.presentation.fragments
+package com.bignerdranch.android.weatherapp.presentation.state
 
 /**
  * @author e.petrashko

@@ -1,7 +1,5 @@
-package com.bignerdranch.android.weatherapp.presentation.fragments
+package com.bignerdranch.android.weatherapp.presentation.state
 
-import android.graphics.Color
-import com.bignerdranch.android.weatherapp.domain.models.city.City
 import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 
 /**

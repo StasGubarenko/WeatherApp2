@@ -1,18 +1,15 @@
 package com.bignerdranch.android.weatherapp.presentation.fragments.viewmodel
 
 import android.graphics.Color
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bignerdranch.android.weatherapp.R
 import com.bignerdranch.android.weatherapp.domain.models.weather.Weather
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadCityUseCase
 import com.bignerdranch.android.weatherapp.domain.usecase.LoadWeatherUseCase
-import com.bignerdranch.android.weatherapp.domain.usecase.ValidationFieldUseCase
-import com.bignerdranch.android.weatherapp.presentation.fragments.News
-import com.bignerdranch.android.weatherapp.presentation.fragments.State
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.bignerdranch.android.weatherapp.domain.usecase.ValidateFieldUseCase
+import com.bignerdranch.android.weatherapp.presentation.state.News
+import com.bignerdranch.android.weatherapp.presentation.state.State
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,7 +20,7 @@ import kotlinx.coroutines.launch
 class FragmentViewModel(
     private val loadCityUseCase: LoadCityUseCase,
     private val loadWeatherUseCase: LoadWeatherUseCase,
-    private val validationFieldUseCase: ValidationFieldUseCase
+    private val validateFieldUseCase: ValidateFieldUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(
@@ -45,7 +42,7 @@ class FragmentViewModel(
 
          val currentState = _state.value
 
-         if (validationFieldUseCase.validate(input)){
+         if (validateFieldUseCase.validate(input)){
              viewModelScope.launch {
                  try {
                      if (currentState is State.Content) {
@@ -82,7 +79,7 @@ class FragmentViewModel(
 
      fun loadWeather(city: String) {
         val currentState = _state.value
-        if (currentState is State.Content && validationFieldUseCase.validate(city)) {
+        if (currentState is State.Content && validateFieldUseCase.validate(city)) {
 
             _state.value = State.Loading(
                 isVisible = true,
@@ -93,22 +90,23 @@ class FragmentViewModel(
                 var weather : Weather? = null
                 try {
                      weather = loadWeatherUseCase.execute(city = city)
+
                     if (weather != null) {
                         _state.value = currentState.copy(weather = weather)
                         _news.emit(News.NavigateForward)
                     } else {
-                        _news.emit(News.ShowError)
                         _state.value = State.Loading(
                             isVisible = false,
                             buttonText = R.string.search_button
                         )
+                        _news.emit(News.ShowError)
                     }
                 } catch (e: Exception) {
-                    _news.emit(News.ShowError)
                     _state.value = State.Loading(
                         isVisible = false,
                         buttonText = R.string.search_button
                     )
+                    _news.emit(News.ShowError)
                 }finally {
                     _state.value = currentState.copy(
                         weather = weather
