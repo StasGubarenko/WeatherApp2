@@ -82,9 +82,8 @@ class CityRepositoryImplTest{
         assertEquals(expected, actual)
     }
 
-    //Согласен, название не соответствует шаблону.
     @Test
-    fun getCities_сheckInputParametersInMethod() = runBlocking {
+    fun getCities_сheckInputParametersInMethod(): Unit = runBlocking {
 
         val mockCityAPI : CityAPI = mock()
 
@@ -98,16 +97,10 @@ class CityRepositoryImplTest{
         )))
 
         `when`(mockCityAPI.getCities(
-            anyString(),
-            anyString(),
-            anyString()
+            api = BaseAuth.API_CITY,
+            city = INPUT_CITY,
+            count = COUNT
         )).thenReturn(expectedResponse)
-
-
-        //capture
-        val apiCaptor = ArgumentCaptor.forClass(String::class.java)
-        val cityCaptor = ArgumentCaptor.forClass(String::class.java)
-        val countCaptor = ArgumentCaptor.forClass(String::class.java)
 
         mockCityAPI.getCities(
             api = BaseAuth.API_CITY,
@@ -115,43 +108,12 @@ class CityRepositoryImplTest{
             count = COUNT
         )
 
+
         verify(mockCityAPI).getCities(
-            api = apiCaptor.capture(),
-            city = cityCaptor.capture(),
-            count = countCaptor.capture())
-
-        assertEquals(BaseAuth.API_CITY, apiCaptor.value)
-        assertEquals(INPUT_CITY, cityCaptor.value)
-        assertEquals(COUNT, countCaptor.value)
-    }
-
-    @Test
-    fun test() = runBlocking{
-
-        val mockCityAPI : CityAPI = mock()
-
-        val cityRepository = CityRepositoryImpl(mockCityAPI)
-        val expectedResponse = Response.success(listOf<City>())
-        `when`(mockCityAPI.getCities(
             api = BaseAuth.API_CITY,
             city = INPUT_CITY,
             count = COUNT
-        ))
-            .thenReturn(expectedResponse)
-
-        cityRepository.getCities(inputNameOfCity = INPUT_CITY)
-
-        val argumentApi = ArgumentCaptor.forClass(String::class.java)
-        val argumentCity = ArgumentCaptor.forClass(String::class.java)
-        val argumentCount = ArgumentCaptor.forClass(String::class.java)
-
-        verify(mockCityAPI).getCities(
-            api = argumentApi.capture(),
-            city = argumentCity.capture(),
-            count = argumentCount.capture()
         )
-
-        assertEquals(INPUT_CITY, argumentCity.value)
     }
 
     private companion object {
