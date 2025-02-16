@@ -37,18 +37,22 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
 }
 
 dependencies {
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.6")
+    implementation("androidx.test.ext:junit-ktx:1.2.1")
+
     val fragment_version = "1.8.3"
 
     // Java language implementation
-    implementation("androidx.fragment:fragment:$fragment_version")
+    //noinspection GradleDependency
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
     // Kotlin
+    //noinspection GradleDependency
     implementation("androidx.fragment:fragment-ktx:$fragment_version")
 
     val nav_version = "2.8.1"
@@ -73,5 +77,7 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.4.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.8.4")
+
+    testImplementation ("org.robolectric:robolectric:4.13")
 
 }
